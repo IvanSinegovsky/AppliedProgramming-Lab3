@@ -1,6 +1,8 @@
 package bsu.rfe.java.group7.lab3.Sinegovsky.varA6;
 
 import javax.swing.table.AbstractTableModel;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @SuppressWarnings("serial")
 public class GornerTableModel extends AbstractTableModel {
@@ -30,33 +32,82 @@ public class GornerTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return 2; // В данной модели два столбца
+        return 3;
     }
 
     public int getRowCount() {
         // Вычислить количество точек между началом и концом отрезка исходя из шага табулирования
         return new Double(Math.ceil((to - from) / step)).intValue() + 1;
     }
+
     public Object getValueAt(int row, int col) {
         // Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ * НОМЕР_СТРОКИ
         double x = from + step * row;
-        if (col == 0) {
-            return x;               // Если запрашивается значение 1-го столбца, то это X
-        } else {
-            Double result = 0.0;    // Значение многочлена
-            return result;          // Вычисление значения в точке по схеме Горнера
+
+        double result = coefficients[0];
+        for (int i = 1; i < coefficients.length; ++i) {
+            result = result * x + coefficients[i];
+        }
+
+        switch (col) {
+            // Если запрашивается значение 1-го столбца, то это X
+            case 0: {
+                return x;
+            }
+            // Если запрашивается значение 2-го столбца, то это значение многочлена
+            case 1: {
+                return result;
+            }
+            // Если запрашивается значение 3-го столбца, то проверяем на дробную часть
+            case 2:
+                result = round(result, 2);
+
+                int full = (int) result;
+                int drob = (int) ((result - full) * 100);
+
+                if(drob % 2 == 0) {
+                    return false;
+                }
+                else return true;
+            default:
+                return 0.0;
         }
     }
 
     public String getColumnName(int col) {
         switch (col) {
-            case 0:
-                return "Значение X";            // Название 1-го столбца
-            default:
-                return "Значение многочлена";   // Название 2-го столбца
+            case 0: {
+                return "Значение X";
+            }
+            case 1: {
+                return "Значение многочлена";
+            }
+            case 2: {
+                return "Дробная часть нечётная";
+            }
+            default: {
+                return "";
+            }
         }
     }
+
     public Class<?> getColumnClass(int col) {
-        return Double.class;
+        // И в 1-ом и во 2-ом столбце находятся значения типа Double
+        if (col == 2) {
+            return Boolean.class;
+        } else {
+            return Double.class;
+        }
+    }
+
+    private static double round(double value, int places) {
+        if (places < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+
+        return bd.doubleValue();
     }
 }
