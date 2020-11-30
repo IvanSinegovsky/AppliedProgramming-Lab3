@@ -228,6 +228,7 @@ public class MainFrame extends JFrame {
     }
 
     protected void saveToTextFile(File selectedFile) {
+
         try {
             // Создать новый символьный поток вывода, направленный в указанный файл
             PrintStream out = new PrintStream(selectedFile);
@@ -235,7 +236,7 @@ public class MainFrame extends JFrame {
             out.print("Многочлен: ");
 
             for (int i = 0; i < coefficients.length; i++) {
-                out.print(coefficients[i] + "*X^" + (coefficients.length - i - 1));
+                out.print(coefficients[i] + " * X^" + (coefficients.length - i - 1));
 
                 if (i != coefficients.length - 1) {
                     out.print(" + ");

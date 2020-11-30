@@ -43,10 +43,12 @@ public class GornerTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         // Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ * НОМЕР_СТРОКИ
         double x = from + step * row;
-
+        x = round(x, 2);
         double result = coefficients[0];
+
         for (int i = 1; i < coefficients.length; ++i) {
             result = result * x + coefficients[i];
+            result = round(result, 2);
         }
 
         switch (col) {
@@ -60,15 +62,13 @@ public class GornerTableModel extends AbstractTableModel {
             }
             // Если запрашивается значение 3-го столбца, то проверяем на дробную часть
             case 2:
-                result = round(result, 2);
+                result *= 100;
 
-                int full = (int) result;
-                int drob = (int) ((result - full) * 100);
-
-                if(drob % 2 == 0) {
+                if(result % 2 == 0) {
                     return false;
+                } else {
+                    return true;
                 }
-                else return true;
             default:
                 return 0.0;
         }
